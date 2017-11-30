@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{F6B61748-D9F2-450A-B58C-53D4C843D4B4}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="AdafruitMotor.cs">
+    <Files>
+      <File FileName="Program.cs" Line="15" Column="10" />
+      <File FileName="AdafruitV2.cs" Line="11" Column="36" />
+      <File FileName="AdafruitMotor.cs" Line="11" Column="18" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.UseRobot PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

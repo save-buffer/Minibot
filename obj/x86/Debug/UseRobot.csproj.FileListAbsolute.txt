@@ -1,0 +1,10 @@
+/Users/sasha/Projects/UseRobot/obj/x86/Debug/UseRobot.csprojResolveAssemblyReference.cache
+/Users/sasha/Projects/UseRobot/obj/x86/Debug/UseRobot.csproj.CoreCompileInputs.cache
+/Users/sasha/Projects/UseRobot/bin/Debug/UseRobot.exe
+/Users/sasha/Projects/UseRobot/bin/Debug/UseRobot.pdb
+/Users/sasha/Projects/UseRobot/bin/Debug/Scarlet.dll
+/Users/sasha/Projects/UseRobot/bin/Debug/BBBCSIO.dll
+/Users/sasha/Projects/UseRobot/obj/x86/Debug/UseRobot.exe
+/Users/sasha/Projects/UseRobot/obj/x86/Debug/UseRobot.pdb
+/Users/sasha/Projects/UseRobot/bin/Debug/OpenTK.dll
+/Users/sasha/Projects/UseRobot/bin/Debug/OpenTK.xml
