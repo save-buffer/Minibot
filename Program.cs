@@ -44,7 +44,7 @@ namespace UseRobot
                 if (State.IsConnected)
                     Console.WriteLine($"Left: {State.Triggers.Left}, Right: {State.Triggers.Right}");
                 else
-                    Console.WriteLine("NOT CONNECTED U MONGOL tenghis");
+                    Console.WriteLine("NOT CONNECTED");
                 double Val = 1.0;
                 pid.Feed(Analog.GetInput());
                 if (!ReceivingInput(State))
