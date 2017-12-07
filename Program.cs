@@ -51,13 +51,14 @@ namespace UseRobot
                 {
                     Val = Analog.GetInput();
                 }
-                Motor[0].Speed = State.Triggers.Left * 75.0f + Val;
+                Console.WriteLine(Val);
+                Motor[0].Speed = State.Triggers.Left * -75.0f;
                 Motor[0].UpdateState();
-                Motor[1].Speed = State.Triggers.Right * 75.0f + Val;
+                Motor[1].Speed = State.Triggers.Right * 75.0f;
                 Motor[1].UpdateState();
-                Motor[2].Speed = State.Triggers.Right * 75.0f + Val;
+                Motor[2].Speed = State.Triggers.Left * 75.0f;
                 Motor[2].UpdateState();
-                Motor[3].Speed = State.Triggers.Left * 75.0f + Val;
+                Motor[3].Speed = State.Triggers.Right * 75.0f;
                 Motor[3].UpdateState();
             } while (State.Buttons.Start != ButtonState.Pressed);
         }
