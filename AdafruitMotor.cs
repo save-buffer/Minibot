@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace UseRobot
 {
-    public class AdafruitMotor : IMotor
+    public class AdafruitMotor //: IMotor
     {
         private IPWMOutput Output;
         public double Speed; // -100.0 to 100.0

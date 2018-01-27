@@ -45,6 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AdafruitV2.cs" />
     <Compile Include="AdafruitMotor.cs" />
+    <Compile Include="Magnetometer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenTK.dll.config" />

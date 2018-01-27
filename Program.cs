@@ -6,6 +6,7 @@ using Scarlet.Communications;
 using Scarlet.Controllers;
 using Scarlet.IO;
 using Scarlet.IO.BeagleBone;
+using Scarlet.IO.RaspberryPi;
 using OpenTK.Input;
 
 //0.0113 VOLTS/DEGREES
@@ -24,8 +25,20 @@ namespace UseRobot
         {
             Console.WriteLine("Initializing");
             StateStore.Start("Sasha and Jeremy");
-            BeagleBone.Initialize(SystemMode.DEFAULT, true);
+            /*BeagleBone.Initialize(SystemMode.DEFAULT, true);
             BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
+            BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
+            II2CBus i2c = I2CBBB.I2CBus2;*/
+            RaspberryPi.Initialize();
+            II2CBus i2c = new I2CBusPi();
+            Magnetometer mag = new Magnetometer(i2c);
+            mag.Begin();
+            for (;;)
+            {
+                var vec = mag.GetVector(Magnetometer.adafruit_vector_type_t.VECTOR_MAGNETOMETER);
+                Console.WriteLine($"Vector:<{vec.x}, {vec.y}, {vec.z}>");
+            }
+            /*
             BBBPinManager.AddMappingADC(BBBPin.P9_39);
             BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
             PID pid = new PID(P);
@@ -61,6 +74,7 @@ namespace UseRobot
                 Motor[3].Speed = State.Triggers.Right * 75.0f;
                 Motor[3].UpdateState();
             } while (State.Buttons.Start != ButtonState.Pressed);
+            */
         }
     }
 }
