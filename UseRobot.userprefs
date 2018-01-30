@@ -1,10 +1,8 @@
 ﻿<Properties StartupConfiguration="{F6B61748-D9F2-450A-B58C-53D4C843D4B4}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Program.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Magnetometer.cs">
     <Files>
-      <File FileName="Program.cs" Line="27" Column="13" />
-      <File FileName="AdafruitMotor.cs" Line="13" Column="34" />
-      <File FileName="AdafruitV2.cs" Line="59" Column="1" />
-      <File FileName="Magnetometer.cs" Line="328" Column="21" />
+      <File FileName="Program.cs" Line="35" Column="25" />
+      <File FileName="Magnetometer.cs" Line="281" Column="16" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />

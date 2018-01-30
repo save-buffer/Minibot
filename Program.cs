@@ -33,10 +33,10 @@ namespace UseRobot
             //II2CBus i2c = new I2CBusPi();
             Magnetometer mag = new Magnetometer(i2c);
             mag.Begin();
-            for (; ; )
+            for (;;)
             {
-                var vec = mag.GetVector(Magnetometer.adafruit_vector_type_t.VECTOR_MAGNETOMETER);
-                Console.WriteLine($"Vector:<{vec.x}, {vec.y}, {vec.z}>");
+                var (x, y, z) = mag.GetVector(Magnetometer.adafruit_vector_type_t.VECTOR_MAGNETOMETER);
+                Console.WriteLine($"Vector:<{x}, {y}, {z}>");
             }
             /*
             BBBPinManager.AddMappingADC(BBBPin.P9_39);

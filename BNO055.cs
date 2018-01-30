@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace UseRobot
 {
-    public class Magnetometer
+    public class BNO055 : ISensor
     {
         //For the BNO055 Magnetometer
 
@@ -19,14 +19,7 @@ namespace UseRobot
         public const byte BNO055_ID = 0xA0;
         public const byte NUM_BNO055_OFFSET_REGISTERS = 22;
 
-        public struct Vector
-        {
-            public float x;
-            public float y;
-            public float z;
-        }
-
-        public struct adafruit_bno055_offsets_t
+        private struct Offsets
         {
             public short accel_offset_x;
             public short accel_offset_y;
@@ -42,7 +35,7 @@ namespace UseRobot
             public short mag_radius;
         }
 
-        public enum adafruit_bno055_reg_t : byte
+        private enum Register : byte
         {
             /* Page id register definition */
             BNO055_PAGE_ID_ADDR = 0X07,
@@ -192,14 +185,14 @@ namespace UseRobot
             MAG_RADIUS_MSB_ADDR = 0X6A
         }
 
-        public enum adafruit_bno055_powermode_t
+        private enum Powermode
         {
             POWER_MODE_NORMAL = 0X00,
             POWER_MODE_LOWPOWER = 0X01,
             POWER_MODE_SUSPEND = 0X02
         }
 
-        public enum adafruit_bno055_opmode_t
+        public enum OperationMode
         {
             /* Operation mode settings*/
             OPERATION_MODE_CONFIG = 0X00,
@@ -217,7 +210,7 @@ namespace UseRobot
             OPERATION_MODE_NDOF = 0X0C
         }
 
-        public enum adafruit_bno055_axis_remap_config_t
+        private enum AxisRemapConfig
         {
             REMAP_CONFIG_P0 = 0x21,
             REMAP_CONFIG_P1 = 0x24, // default
@@ -230,7 +223,7 @@ namespace UseRobot
         }
 
 
-        public enum adafruit_bno055_axis_remap_sign_t
+        private enum AxisRemapSign
         {
             REMAP_SIGN_P0 = 0x04,
             REMAP_SIGN_P1 = 0x00, // default
@@ -242,7 +235,7 @@ namespace UseRobot
             REMAP_SIGN_P7 = 0x05
         }
 
-        public struct adafruit_bno055_rev_info_t
+        private struct RevInfo
         {
             byte accel_rev;
             byte mag_rev;
@@ -251,55 +244,64 @@ namespace UseRobot
             byte bl_rev;
         }
 
-        public enum adafruit_vector_type_t
+        public enum VectorType
         {
-            VECTOR_ACCELEROMETER = adafruit_bno055_reg_t.BNO055_ACCEL_DATA_X_LSB_ADDR,
-            VECTOR_MAGNETOMETER = adafruit_bno055_reg_t.BNO055_MAG_DATA_X_LSB_ADDR,
-            VECTOR_GYROSCOPE = adafruit_bno055_reg_t.BNO055_GYRO_DATA_X_LSB_ADDR,
-            VECTOR_EULER = adafruit_bno055_reg_t.BNO055_EULER_H_LSB_ADDR,
-            VECTOR_LINEARACCEL = adafruit_bno055_reg_t.BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR,
-            VECTOR_GRAVITY = adafruit_bno055_reg_t.BNO055_GRAVITY_DATA_X_LSB_ADDR
+            VECTOR_ACCELEROMETER = Register.BNO055_ACCEL_DATA_X_LSB_ADDR,
+            VECTOR_MAGNETOMETER = Register.BNO055_MAG_DATA_X_LSB_ADDR,
+            VECTOR_GYROSCOPE = Register.BNO055_GYRO_DATA_X_LSB_ADDR,
+            VECTOR_EULER = Register.BNO055_EULER_H_LSB_ADDR,
+            VECTOR_LINEARACCEL = Register.BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR,
+            VECTOR_GRAVITY = Register.BNO055_GRAVITY_DATA_X_LSB_ADDR
         }
 
         int id;
         byte address;
-        adafruit_bno055_opmode_t mode;
+        OperationMode mode;
         II2CBus i2c;
-        public Magnetometer(II2CBus i2c, int id = -1, byte address = BNO055_ADDRESS_A)
+
+        float X, Y, Z;
+
+
+        public BNO055(II2CBus i2c, int id = -1, byte address = BNO055_ADDRESS_A)
         {
             this.id = id;
             this.address = address;
             this.i2c = i2c;
         }
 
-        public bool Begin(adafruit_bno055_opmode_t mode = adafruit_bno055_opmode_t.OPERATION_MODE_NDOF)
+        public bool Begin(OperationMode mode = OperationMode.OPERATION_MODE_NDOF)
         {
             try
             {
-                write8((byte)adafruit_bno055_reg_t.BNO055_PAGE_ID_ADDR, 0);
+                write8((byte)Register.BNO055_PAGE_ID_ADDR, 0);
             }
-            catch { }
+            catch
+            {
+                goto GoAgain;
+            }
 
-            SetMode(adafruit_bno055_opmode_t.OPERATION_MODE_CONFIG);
-            write8((byte)adafruit_bno055_reg_t.BNO055_PAGE_ID_ADDR, 0);
+        GoAgain:
 
-            byte id = read8((byte)adafruit_bno055_reg_t.BNO055_CHIP_ID_ADDR);
+            SetMode(OperationMode.OPERATION_MODE_CONFIG);
+            write8((byte)Register.BNO055_PAGE_ID_ADDR, 0);
+
+            byte id = read8((byte)Register.BNO055_CHIP_ID_ADDR);
             if (id != BNO055_ID)
             {
                 return false;
             }
 
-            write8((byte) adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x20);
+            write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x20);
             Thread.Sleep(750); // Minimum of 650 ms wait time for power reset
-            write8((byte) adafruit_bno055_reg_t.BNO055_PWR_MODE_ADDR, (byte) adafruit_bno055_powermode_t.POWER_MODE_NORMAL & 0xFF);
-            write8((byte) adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x00);
+            write8((byte)Register.BNO055_PWR_MODE_ADDR, (byte)Powermode.POWER_MODE_NORMAL & 0xFF);
+            write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x00);
             SetMode(mode);
             return true;
         }
 
-        public Vector GetVector(adafruit_vector_type_t vector_type)
+        public (float, float, float) GetVector(VectorType vector_type)
         {
-            Vector xyz;
+            (float, float, float) xyz;
             short x = 0;
             short y = 0;
             short z = 0;
@@ -310,27 +312,44 @@ namespace UseRobot
             z = (short)((buffer[5] << 8) | buffer[4]);
             switch (vector_type)
             {
-                case adafruit_vector_type_t.VECTOR_MAGNETOMETER:
-                case adafruit_vector_type_t.VECTOR_EULER:
-                case adafruit_vector_type_t.VECTOR_GYROSCOPE:
-                    xyz.x = x / 16.0f;
-                    xyz.y = y / 16.0f;
-                    xyz.z = z / 16.0f;
+                case VectorType.VECTOR_MAGNETOMETER:
+                case VectorType.VECTOR_EULER:
+                case VectorType.VECTOR_GYROSCOPE:
+                    xyz.Item1 = x / 16.0f;
+                    xyz.Item2 = y / 16.0f;
+                    xyz.Item3 = z / 16.0f;
                     break;
                 default:
-                    xyz.x = x / 100.0f;
-                    xyz.y = y / 100.0f;
-                    xyz.z = z / 100.0f;
+                    xyz.Item1 = x / 100.0f;
+                    xyz.Item2 = y / 100.0f;
+                    xyz.Item3 = z / 100.0f;
                     break;
             }
             return xyz;
         }
 
-        public void SetMode(adafruit_bno055_opmode_t mode)
+        public void SetMode(OperationMode mode)
         {
             this.mode = mode;
-            write8((byte) adafruit_bno055_reg_t.BNO055_OPR_MODE_ADDR, (byte) (((byte) mode) & 0xFF));
+            write8((byte)Register.BNO055_OPR_MODE_ADDR, (byte)(((byte)mode) & 0xFF));
             Thread.Sleep(30);
+        }
+
+        public bool Test()
+        {
+            Begin();
+            var (x, y, z) = this.GetVector(VectorType.VECTOR_MAGNETOMETER);
+            return (x != 0.0f || y != 0.0f || z != 0.0f);
+        }
+
+        public void UpdateState()
+        {
+            (this.X, this.Y, this.Z) = GetVector(VectorType.VECTOR_MAGNETOMETER);
+        }
+
+        public void EventTriggered(object sender, EventArgs e)
+        {
+            //Do nothing
         }
 
         private byte read8(byte reg)
