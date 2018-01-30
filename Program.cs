@@ -25,15 +25,15 @@ namespace UseRobot
         {
             Console.WriteLine("Initializing");
             StateStore.Start("Sasha and Jeremy");
-            /*BeagleBone.Initialize(SystemMode.DEFAULT, true);
+            BeagleBone.Initialize(SystemMode.DEFAULT, true);
             BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
             BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
-            II2CBus i2c = I2CBBB.I2CBus2;*/
-            RaspberryPi.Initialize();
-            II2CBus i2c = new I2CBusPi();
+            II2CBus i2c = I2CBBB.I2CBus2;
+            //RaspberryPi.Initialize();
+            //II2CBus i2c = new I2CBusPi();
             Magnetometer mag = new Magnetometer(i2c);
             mag.Begin();
-            for (;;)
+            for (; ; )
             {
                 var vec = mag.GetVector(Magnetometer.adafruit_vector_type_t.VECTOR_MAGNETOMETER);
                 Console.WriteLine($"Vector:<{vec.x}, {vec.y}, {vec.z}>");

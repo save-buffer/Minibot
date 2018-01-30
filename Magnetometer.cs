@@ -274,26 +274,26 @@ namespace UseRobot
 
         public bool Begin(adafruit_bno055_opmode_t mode = adafruit_bno055_opmode_t.OPERATION_MODE_NDOF)
         {
+            try
+            {
+                write8((byte)adafruit_bno055_reg_t.BNO055_PAGE_ID_ADDR, 0);
+            }
+            catch { }
+
+            SetMode(adafruit_bno055_opmode_t.OPERATION_MODE_CONFIG);
+            write8((byte)adafruit_bno055_reg_t.BNO055_PAGE_ID_ADDR, 0);
+
             byte id = read8((byte)adafruit_bno055_reg_t.BNO055_CHIP_ID_ADDR);
             if (id != BNO055_ID)
             {
-                Thread.Sleep(1000);
-                id = read8((byte)adafruit_bno055_reg_t.BNO055_CHIP_ID_ADDR);
-                if (id != BNO055_ID)
-                    return false;
+                return false;
             }
-            SetMode(adafruit_bno055_opmode_t.OPERATION_MODE_CONFIG);
-            write8((byte)adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x20);
-            while (read8((byte)adafruit_bno055_reg_t.BNO055_CHIP_ID_ADDR) != BNO055_ID)
-                Thread.Sleep(10);
-            Thread.Sleep(50);
-            write8((byte)adafruit_bno055_reg_t.BNO055_PWR_MODE_ADDR, (byte)adafruit_bno055_powermode_t.POWER_MODE_NORMAL);
-            Thread.Sleep(10);
-            write8((byte)adafruit_bno055_reg_t.BNO055_PAGE_ID_ADDR, 0);
-            write8((byte)adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x00);
-            Thread.Sleep(10);
+
+            write8((byte) adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x20);
+            Thread.Sleep(750); // Minimum of 650 ms wait time for power reset
+            write8((byte) adafruit_bno055_reg_t.BNO055_PWR_MODE_ADDR, (byte) adafruit_bno055_powermode_t.POWER_MODE_NORMAL & 0xFF);
+            write8((byte) adafruit_bno055_reg_t.BNO055_SYS_TRIGGER_ADDR, 0x00);
             SetMode(mode);
-            Thread.Sleep(20);
             return true;
         }
 
@@ -329,7 +329,7 @@ namespace UseRobot
         public void SetMode(adafruit_bno055_opmode_t mode)
         {
             this.mode = mode;
-            write8((byte)adafruit_bno055_reg_t.BNO055_OPR_MODE_ADDR, (byte)mode);
+            write8((byte) adafruit_bno055_reg_t.BNO055_OPR_MODE_ADDR, (byte) (((byte) mode) & 0xFF));
             Thread.Sleep(30);
         }
 
