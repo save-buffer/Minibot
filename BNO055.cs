@@ -1,40 +1,19 @@
-﻿using Scarlet.Components;
-using Scarlet.IO;
-using Scarlet.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Scarlet.IO;
 
-namespace UseRobot
+namespace Scarlet.Components.Sensors
 {
     public class BNO055 : ISensor
     {
-        //For the BNO055 Magnetometer
-
         public const byte BNO055_ADDRESS_A = 0x28;
         public const byte BNO055_ADDRESS_B = 0x29;
         public const byte BNO055_ID = 0xA0;
         public const byte NUM_BNO055_OFFSET_REGISTERS = 22;
 
-        private struct Offsets
-        {
-            public short accel_offset_x;
-            public short accel_offset_y;
-            public short accel_offset_z;
-            public short mag_offset_x;
-            public short mag_offset_y;
-            public short mag_offset_z;
-            public short gyro_offset_x;
-            public short gyro_offset_y;
-            public short gyro_offset_z;
-
-            public short accel_radius;
-            public short mag_radius;
-        }
-
+        /// <summary>
+        /// Enum of all possible registers on the BNO055. 
+        /// </summary>
         private enum Register : byte
         {
             /* Page id register definition */
@@ -185,13 +164,19 @@ namespace UseRobot
             MAG_RADIUS_MSB_ADDR = 0X6A
         }
 
-        private enum Powermode
+        /// <summary>
+        /// The power mode of the BNO055. 
+        /// </summary>
+        private enum PowerMode
         {
             POWER_MODE_NORMAL = 0X00,
             POWER_MODE_LOWPOWER = 0X01,
             POWER_MODE_SUSPEND = 0X02
         }
 
+        /// <summary>
+        /// The operation mode of the BNO055. 
+        /// </summary>
         public enum OperationMode
         {
             /* Operation mode settings*/
@@ -210,40 +195,9 @@ namespace UseRobot
             OPERATION_MODE_NDOF = 0X0C
         }
 
-        private enum AxisRemapConfig
-        {
-            REMAP_CONFIG_P0 = 0x21,
-            REMAP_CONFIG_P1 = 0x24, // default
-            REMAP_CONFIG_P2 = 0x24,
-            REMAP_CONFIG_P3 = 0x21,
-            REMAP_CONFIG_P4 = 0x24,
-            REMAP_CONFIG_P5 = 0x21,
-            REMAP_CONFIG_P6 = 0x21,
-            REMAP_CONFIG_P7 = 0x24
-        }
-
-
-        private enum AxisRemapSign
-        {
-            REMAP_SIGN_P0 = 0x04,
-            REMAP_SIGN_P1 = 0x00, // default
-            REMAP_SIGN_P2 = 0x06,
-            REMAP_SIGN_P3 = 0x02,
-            REMAP_SIGN_P4 = 0x03,
-            REMAP_SIGN_P5 = 0x01,
-            REMAP_SIGN_P6 = 0x07,
-            REMAP_SIGN_P7 = 0x05
-        }
-
-        private struct RevInfo
-        {
-            byte accel_rev;
-            byte mag_rev;
-            byte gyro_rev;
-            short sw_rev;
-            byte bl_rev;
-        }
-
+        /// <summary>
+        /// The possible types of vectors. 
+        /// </summary>
         public enum VectorType
         {
             VECTOR_ACCELEROMETER = Register.BNO055_ACCEL_DATA_X_LSB_ADDR,
@@ -254,112 +208,125 @@ namespace UseRobot
             VECTOR_GRAVITY = Register.BNO055_GRAVITY_DATA_X_LSB_ADDR
         }
 
-        int id;
-        byte address;
-        OperationMode mode;
-        II2CBus i2c;
+        private int ID;
+        private byte Address;
+        private OperationMode Mode;
+        private II2CBus I2C;
 
-        float X, Y, Z;
+        private float X, Y, Z;
 
-
-        public BNO055(II2CBus i2c, int id = -1, byte address = BNO055_ADDRESS_A)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:Scarlet.Components.Sensors.BNO055"/> class, which will communicate via
+        /// the given I2C bus. 
+        /// </summary>
+        /// <param name="I2C"> The I2C bus to communicate over. </param>
+        /// <param name="ID"> ID of BNO055. -1 by default. You probably shouldn't change this. </param>
+        /// <param name="Address"> The I2C address of the BNO055. Defaults to 0x28. You probably shouldn't change this. </param>
+        public BNO055(II2CBus I2C, int ID = -1, byte Address = BNO055_ADDRESS_A)
         {
-            this.id = id;
-            this.address = address;
-            this.i2c = i2c;
+            this.ID = ID;
+            this.Address = Address;
+            this.I2C = I2C;
+            Begin();
         }
 
+        /// <summary>
+        /// Begins the operation of the BNO055 with the target operation mode. NDOF is the default operation mode.
+        /// This method is called from the constructor. Returns whether or not it succeeded. 
+        /// </summary>
+        /// <returns> Whether the BNO055 successfully initialized. </returns>
+        /// <param name="mode"> Operation mode at startup. NDOF by default. </param>
         public bool Begin(OperationMode mode = OperationMode.OPERATION_MODE_NDOF)
         {
-            try
-            {
-                write8((byte)Register.BNO055_PAGE_ID_ADDR, 0);
-            }
-            catch
-            {
-                goto GoAgain;
-            }
-
-        GoAgain:
+            try { Write8((byte)Register.BNO055_PAGE_ID_ADDR, 0); }
+            catch { /* Do nothing */ }
 
             SetMode(OperationMode.OPERATION_MODE_CONFIG);
-            write8((byte)Register.BNO055_PAGE_ID_ADDR, 0);
+            Write8((byte)Register.BNO055_PAGE_ID_ADDR, 0);
 
-            byte id = read8((byte)Register.BNO055_CHIP_ID_ADDR);
-            if (id != BNO055_ID)
-            {
-                return false;
-            }
+            byte id = Read8((byte)Register.BNO055_CHIP_ID_ADDR);
+            if (id != BNO055_ID) { return false; }
 
-            write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x20);
+            Write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x20);
             Thread.Sleep(750); // Minimum of 650 ms wait time for power reset
-            write8((byte)Register.BNO055_PWR_MODE_ADDR, (byte)Powermode.POWER_MODE_NORMAL & 0xFF);
-            write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x00);
+            Write8((byte)Register.BNO055_PWR_MODE_ADDR, (byte)PowerMode.POWER_MODE_NORMAL & 0xFF);
+            Write8((byte)Register.BNO055_SYS_TRIGGER_ADDR, 0x00);
             SetMode(mode);
             return true;
         }
 
-        public (float, float, float) GetVector(VectorType vector_type)
+        /// <summary> Gets the vector corresponding to the orientation of the magnetometer according to the type specified. </summary>
+        /// <returns> 
+        /// The vector. 
+        /// If VECTOR_ACCELEROMETER was passed, the vector is the 3-axis acceleration in mG.
+        /// If VECTOR_MAGNETOMETER was passed, the vector is the Magnetic Field Strength vector in uT.
+        /// If VECTOR_GYROSCOPE was passed, the vector is Angular Velocity Vector in Degrees / sec.
+        /// If VECTOR_EULER was passed, the vector is the orientation as (Roll, Pitch, Yaw) in degrees
+        /// If VECTOR_LINEARACCEL was passed, returns the linear acceleration vector mG.
+        /// If VECTOR_GRAVITY was passed, returns the gravitational acceleration vector in mG.
+        /// </returns>/            
+        /// <param name="VectorType"> Type of vector to be read. </param>
+        public Tuple<float, float, float> GetVector(VectorType VectorType)
         {
-            (float, float, float) xyz;
-            short x = 0;
-            short y = 0;
-            short z = 0;
+            short X = 0;
+            short Y = 0;
+            short Z = 0;
 
-            byte[] buffer = i2c.ReadRegister(address, (byte)vector_type, 6);
-            x = (short)((buffer[1] << 8) | buffer[0]);
-            y = (short)((buffer[3] << 8) | buffer[2]);
-            z = (short)((buffer[5] << 8) | buffer[4]);
-            switch (vector_type)
+            byte[] buffer = I2C.ReadRegister(Address, (byte)VectorType, 6);
+            X = (short)((buffer[1] << 8) | buffer[0]);
+            Y = (short)((buffer[3] << 8) | buffer[2]);
+            Z = (short)((buffer[5] << 8) | buffer[4]);
+            switch (VectorType)
             {
                 case VectorType.VECTOR_MAGNETOMETER:
                 case VectorType.VECTOR_EULER:
                 case VectorType.VECTOR_GYROSCOPE:
-                    xyz.Item1 = x / 16.0f;
-                    xyz.Item2 = y / 16.0f;
-                    xyz.Item3 = z / 16.0f;
-                    break;
+                    return new Tuple<float, float, float>(X / 16.0f, Y / 16.0f, Z / 16.0f);
                 default:
-                    xyz.Item1 = x / 100.0f;
-                    xyz.Item2 = y / 100.0f;
-                    xyz.Item3 = z / 100.0f;
-                    break;
+                    return new Tuple<float, float, float>(X / 100.0f, Y / 100.0f, Z / 100.0f);
             }
-            return xyz;
         }
 
-        public void SetMode(OperationMode mode)
+        /// <summary> Sets the operation mode of the BNO055. Only use if you know what you're doing! </summary>
+        /// <param name="Mode"> The target mode that the BNO-55 will be set to. </param>
+        public void SetMode(OperationMode Mode)
         {
-            this.mode = mode;
-            write8((byte)Register.BNO055_OPR_MODE_ADDR, (byte)(((byte)mode) & 0xFF));
+            this.Mode = Mode;
+            Write8((byte)Register.BNO055_OPR_MODE_ADDR, (byte)(((byte)Mode) & 0xFF));
             Thread.Sleep(30);
         }
 
+        /// <summary> Reads a vector from the BNO055 and ensures that none of them are 0. </summary>
+        /// <returns> Whether or not the BNO055 worked. </returns>
         public bool Test()
         {
             Begin();
-            var (x, y, z) = this.GetVector(VectorType.VECTOR_MAGNETOMETER);
-            return (x != 0.0f || y != 0.0f || z != 0.0f);
+            Tuple<float, float, float> XYZ = this.GetVector(VectorType.VECTOR_MAGNETOMETER);
+            return (XYZ.Item1 != 0.0f || XYZ.Item2 != 0.0f || XYZ.Item3 != 0.0f);
         }
 
+        /// <summary> Reads the position according to the magnetometer and updates the class variables. </summary>
         public void UpdateState()
         {
-            (this.X, this.Y, this.Z) = GetVector(VectorType.VECTOR_MAGNETOMETER);
+            Tuple<float, float, float> XYZ = GetVector(VectorType.VECTOR_MAGNETOMETER);
+            this.X = XYZ.Item1;
+            this.Y = XYZ.Item2;
+            this.Z = XYZ.Item3;
         }
 
-        public void EventTriggered(object sender, EventArgs e)
-        {
-            //Do nothing
-        }
+        /// <summary> Does nothing. </summary>
+        /// <param name="sender"> Sender. </param>
+        /// <param name="e"> The EventArgs object </param>
+        public void EventTriggered(object sender, EventArgs e) { }
 
-        private byte read8(byte reg)
-        {
-            return i2c.ReadRegister(address, reg, 1)[0];
-        }
+        /// <summary> Reads a byte from the specified register. </summary>
+        /// <returns> The byte that was read. </returns>
+        /// <param name="Register"> The register to read from. </param>
+        private byte Read8(byte Register) => I2C.ReadRegister(Address, Register, 1)[0];
 
-        private void write8(byte reg, byte d)
-        {
-            i2c.WriteRegister(address, reg, new byte[] { d });
-        }
+        /// <summary> Writes the specified byte and to the Register. </summary>        
+        /// <param name="Register"> Register to write to. </param>
+        /// <param name="Data"> Byte to write.</param>
+        private void Write8(byte Register, byte Data) => I2C.WriteRegister(Address, Register, new byte[] { Data });
     }
 }

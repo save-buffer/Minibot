@@ -30,12 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Scarlet">
-      <HintPath>..\..\2017-18\Shared\Scarlet\_Builds\Scarlet.dll</HintPath>
-    </Reference>
-    <Reference Include="BBBCSIO">
-      <HintPath>..\..\2017-18\Shared\Scarlet\_Builds\BBBCSIO.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>packages\OpenTK.2.0.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -43,6 +37,9 @@
       <HintPath>packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Scarlet">
+      <HintPath>..\..\Scarlet\bin\Debug\Scarlet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -50,6 +47,8 @@
     <Compile Include="AdafruitV2.cs" />
     <Compile Include="AdafruitMotor.cs" />
     <Compile Include="BNO055.cs" />
+    <Compile Include="VL53L0X.cs" />
+    <Compile Include="MTK3339.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenTK.dll.config" />

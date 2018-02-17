@@ -1,9 +1,24 @@
 ﻿<Properties StartupConfiguration="{F6B61748-D9F2-450A-B58C-53D4C843D4B4}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Magnetometer.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Program.cs">
     <Files>
-      <File FileName="Program.cs" Line="35" Column="25" />
-      <File FileName="Magnetometer.cs" Line="281" Column="16" />
+      <File FileName="../../Scarlet/IO/ICANBus.cs" Line="1" Column="1" />
+      <File FileName="../../Scarlet/IO/BeagleBone/CANBusBBB.cs" Line="83" Column="9" />
+      <File FileName="Program.cs" Line="37" Column="27" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="UseRobot" expanded="True">
+            <Node name="UseRobot" expanded="True">
+              <Node name="References" expanded="True">
+                <Node name="From Packages" expanded="True" />
+              </Node>
+              <Node name="Program.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
