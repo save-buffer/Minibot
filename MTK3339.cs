@@ -5,7 +5,7 @@ using Scarlet.IO;
 
 namespace Scarlet.Components.Sensors
 {
-    public class MTK3339 : ISensor
+    public class MTK3339// : ISensor
     {
         private const string UPDATE_200_MSEC = "$PMTK220,200*2C\r\n";
         private const string MEAS_200_MSEC = "$PMTK300,200,0,0,0,0*2F\r\n";

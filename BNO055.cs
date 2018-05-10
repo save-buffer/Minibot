@@ -4,7 +4,7 @@ using Scarlet.IO;
 
 namespace Scarlet.Components.Sensors
 {
-    public class BNO055 : ISensor
+    public class BNO055// : ISensor
     {
         public const byte BNO055_ADDRESS_A = 0x28;
         public const byte BNO055_ADDRESS_B = 0x29;

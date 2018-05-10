@@ -13,7 +13,19 @@ namespace UseRobot
     public class AdafruitMotor //: IMotor
     {
         private IPWMOutput Output;
-        public double Speed; // -100.0 to 100.0
+        private double speed;
+        public double Speed
+        {
+            get
+            {
+                return speed;
+            }
+            set
+            {
+                speed = value;
+                this.UpdateState();
+            }
+        } // -100.0 to 100.0
 
         public AdafruitMotor(IPWMOutput Output)
         {
@@ -38,7 +50,7 @@ namespace UseRobot
         }
     }
 
-    public class AdafruitMotorPWM : IPWMOutput
+    public class AdafruitMotorPWM// : IPWMOutput
     {
 
         private II2CBus Bus;

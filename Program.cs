@@ -24,18 +24,19 @@ namespace UseRobot
         public static void Main(string[] args)
         {
             Console.WriteLine("Initializing");
-            StateStore.Start("Sasha and Jeremy");
+            StateStore.Start("CAN");
             BeagleBone.Initialize(SystemMode.DEFAULT, true);
-            BBBPinManager.AddMappingsCAN(BBBPin.P9_20, BBBPin.P9_19);
+            //BBBPinManager.AddMappingsCAN(BBBPin.P9_20, BBBPin.P9_19);
 
             //BBBPinManager.AddMappingUART(BBBPin.P9_24);
             //BBBPinManager.AddMappingUART(BBBPin.P9_26);
             //BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
-            BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
+            //BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
 
             ICANBus can = CANBBB.CANBus0;
-            can.Write(1, new byte[] { 1, 2, 3 });
-            byte[] read = can.Read(1, 3);
+            can.Write(1, new byte[] { 0x11, 0x22 });
+            var (id, read) = can.Read();
+            Console.WriteLine("ID: " + id);
             foreach (byte b in read)
                 Console.WriteLine(b);
             //II2CBus i2c = I2CBBB.I2CBus2;
