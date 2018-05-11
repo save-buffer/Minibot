@@ -49,7 +49,7 @@ namespace UseRobot
 				{
 					string s = Console.ReadLine();
 					byte[] send = new byte[8];
-					for (int i = 0; i < Math.Min(8, s.Length); i++)
+					for (int i = 0; i < Math.Min(8, s.Length - 1); i++)
 						send[i] = (byte)s[i];
 				}
 
