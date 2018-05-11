@@ -52,6 +52,7 @@ namespace UseRobot
 					byte[] send = new byte[8];
 					for (int i = 0; i < Math.Min(8, s.Length - 1); i++)
 						send[i] = (byte)s[i];
+					can.Write(0x01, send);
 				}
 
 				Read = !Read;
