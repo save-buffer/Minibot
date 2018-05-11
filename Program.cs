@@ -52,7 +52,7 @@ namespace UseRobot
 				else
 				{
 					string s = Console.ReadLine();
-					byte[] send = new byte[8];
+					byte[] send = new byte[Math.Min(8, s.Length - 1)];
 					for (int i = 0; i < Math.Min(8, s.Length - 1); i++)
 						send[i] = Convert.ToByte(s[i]);
 					can.Write(0x123, send);
