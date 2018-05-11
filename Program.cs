@@ -33,26 +33,29 @@ namespace UseRobot
 			//BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
 			//BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
 
-
-			bool Read = args.Length > 0 && args[0].ToLower() == "Read";
+			bool Read = args.Length > 0;
 
 			ICANBus can = CANBBB.CANBus0;
 			for (; ; )
 			{
 				if (Read)
 				{
+					Console.WriteLine("READING");
 					var (id, read) = can.Read();
+					Console.WriteLine("RECEIVED");
 					Console.Write($"ID { id }: ");
 					foreach (byte b in read)
-						Console.Write((char)b);
+						Console.Write(Convert.ToChar(b));
+					Console.WriteLine();
 				}
 				else
 				{
 					string s = Console.ReadLine();
 					byte[] send = new byte[8];
 					for (int i = 0; i < Math.Min(8, s.Length - 1); i++)
-						send[i] = (byte)s[i];
+						send[i] = Convert.ToByte(s[i]);
 					can.Write(0x01, send);
+					Thread.Sleep(10);
 				}
 
 				Read = !Read;
