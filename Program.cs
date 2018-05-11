@@ -41,9 +41,7 @@ namespace UseRobot
 				Console.WriteLine(Read);
 				if (Read)
 				{
-					Console.WriteLine("READING");
 					var (id, read) = can.Read();
-					Console.WriteLine("RECEIVED");
 					Console.Write($"ID { id }: ");
 					foreach (byte b in read)
 						Console.Write(Convert.ToChar(b));
@@ -52,8 +50,8 @@ namespace UseRobot
 				else
 				{
 					string s = Console.ReadLine();
-					byte[] send = new byte[Math.Min(8, s.Length - 1)];
-					for (int i = 0; i < Math.Min(8, s.Length - 1); i++)
+					byte[] send = new byte[Math.Min(8, s.Length)];
+					for (int i = 0; i < Math.Min(8, s.Length); i++)
 						send[i] = Convert.ToByte(s[i]);
 					can.Write(0x123, send);
 					Thread.Sleep(10);
