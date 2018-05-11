@@ -33,7 +33,8 @@ namespace UseRobot
 			//BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
 			//BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
 
-			bool Read = args[0].ToLower() == "Read";
+
+			bool Read = args.Length > 0 && args[0].ToLower() == "Read";
 
 			ICANBus can = CANBBB.CANBus0;
 			for (; ; )
