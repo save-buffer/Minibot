@@ -13,38 +13,55 @@ using OpenTK.Input;
 
 namespace UseRobot
 {
-    class MainClass
-    {
-        static bool ReceivingInput(GamePadState State)
-        {
-            return State.Triggers.Left <= Double.Epsilon && State.Triggers.Right <= Double.Epsilon;
-        }
+	class MainClass
+	{
+		static bool ReceivingInput(GamePadState State)
+		{
+			return State.Triggers.Left <= Double.Epsilon && State.Triggers.Right <= Double.Epsilon;
+		}
 
-        const float P = 0.5f;
-        public static void Main(string[] args)
-        {
-            Console.WriteLine("Initializing");
-            StateStore.Start("CAN");
-            BeagleBone.Initialize(SystemMode.DEFAULT, true);
-            //BBBPinManager.AddMappingsCAN(BBBPin.P9_20, BBBPin.P9_19);
+		const float P = 0.5f;
+		public static void Main(string[] args)
+		{
+			Console.WriteLine("Initializing");
+			StateStore.Start("CAN");
+			BeagleBone.Initialize(SystemMode.DEFAULT, true);
+			//BBBPinManager.AddMappingsCAN(BBBPin.P9_20, BBBPin.P9_19);
 
-            //BBBPinManager.AddMappingUART(BBBPin.P9_24);
-            //BBBPinManager.AddMappingUART(BBBPin.P9_26);
-            //BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
-            //BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
+			//BBBPinManager.AddMappingUART(BBBPin.P9_24);
+			//BBBPinManager.AddMappingUART(BBBPin.P9_26);
+			//BBBPinManager.AddMappingsI2C(BBBPin.P9_19, BBBPin.P9_20);
+			//BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
 
-            ICANBus can = CANBBB.CANBus0;
-            can.Write(1, new byte[] { 0x11, 0x22 });
-            var (id, read) = can.Read();
-            Console.WriteLine("ID: " + id);
-            foreach (byte b in read)
-                Console.WriteLine(b);
-            //II2CBus i2c = I2CBBB.I2CBus2;
-            //RaspberryPi.Initialize();
-            //II2CBus i2c = new I2CBusPi();
-            //BNO055 mag = new BNO055(i2c);
-            //mag.Begin();
-            /*
+			bool Read = args[0].ToLower() == "Read";
+
+			ICANBus can = CANBBB.CANBus0;
+			for (; ; )
+			{
+				if (Read)
+				{
+					var (id, read) = can.Read();
+					Console.Write($"ID { id }: ");
+					foreach (byte b in read)
+						Console.Write((char)b);
+				}
+				else
+				{
+					string s = Console.ReadLine();
+					byte[] send = new byte[8];
+					for (int i = 0; i < Math.Min(8, s.Length); i++)
+						send[i] = (byte)s[i];
+				}
+
+				Read = !Read;
+			}
+
+			//II2CBus i2c = I2CBBB.I2CBus2;
+			//RaspberryPi.Initialize();
+			//II2CBus i2c = new I2CBusPi();
+			//BNO055 mag = new BNO055(i2c);
+			//mag.Begin();
+			/*
             IUARTBus uart = UARTBBB.UARTBus1;
             Scarlet.Components.Sensors.MTK3339 mtk = new Scarlet.Components.Sensors.MTK3339(uart);
             int i = 0;
@@ -57,7 +74,7 @@ namespace UseRobot
                     Console.WriteLine("Fix: " + mtk.HasFix());
                 i++;
             }*/
-            /*
+			/*
             BBBPinManager.AddMappingADC(BBBPin.P9_39);
             BBBPinManager.ApplyPinSettings(BBBPinManager.ApplicationMode.APPLY_IF_NONE);
             PID pid = new PID(P);
@@ -94,6 +111,6 @@ namespace UseRobot
                 Motor[3].UpdateState();
             } while (State.Buttons.Start != ButtonState.Pressed);
             */
-        }
-    }
+		}
+	}
 }
